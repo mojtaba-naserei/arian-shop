@@ -1,5 +1,5 @@
  <?php
-require_once('connection.php'); //connect to DB
+require_once('../lib/connection.php'); //connect to DB
 
 // $conn->close();
 
@@ -18,7 +18,7 @@ if(isset($_POST) && $_POST != null){
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        echo ' این کاربر وجود دارد . مجددا امتحان کنید';
+        echo ' این فروشگاه وجود دارد . مجددا امتحان کنید';
     } 
     else {
         if(
@@ -41,7 +41,7 @@ if(isset($_POST) && $_POST != null){
             )";
 
             if ($conn->query($sql) === TRUE) {
-                echo "ثبت نام با موفقیت انجام شد";
+                echo "ثبت فروشگاه با موفقیت انجام شد";
             } 
             else {
                 echo "Error: " . $sql . "<br>" . $conn->error;
@@ -84,7 +84,7 @@ if(isset($_POST) && $_POST != null){
 
 <br>
     <div class="clearfix">
-      <button type="submit" class="signupbtn">ثبت نام</button>
+      <button type="submit" class="signupbtn">ثبت </button>
     </div>
   </div>
 </form> 

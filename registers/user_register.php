@@ -1,24 +1,25 @@
  <?php
-require_once('connection.php'); //connect to DB
+require_once('../lib/connection.php'); //connect to DB
 
 // $conn->close();
 
 if(isset($_POST) && $_POST != null){
     $user_name_family = $_POST['user_name_family'];
     $user_mobile = $_POST['user_mobile'];
+    $user_address = $_POST['user_address'];
     $user_pass = md5($_POST['user_pass']);
 
 //============================================ check exsit
-    $sql = "SELECT * FROM users WHERE user_mobile = $userMobile";
+    $sql = "SELECT * FROM users WHERE user_mobile = $user_mobile";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         echo ' این کاربر وجود دارد . مجددا امتحان کنید';
     } 
     else {
-        if(isset($user_name_family) && isset($user_mobile) && isset($user_pass)){
-            $sql = "INSERT INTO users (user_name_family, user_mobile, user_pass)
-            VALUES ('$user_name_family','$user_mobile', '$user_pass')";
+        if(isset($user_name_family) && isset($user_mobile) && isset($user_address) && isset($user_pass)){
+            $sql = "INSERT INTO users (user_name_family, user_mobile,user_address, user_pass)
+            VALUES ('$user_name_family','$user_mobile','$user_address', '$user_pass')";
 
             if ($conn->query($sql) === TRUE) {
                 echo "ثبت نام با موفقیت انجام شد";
@@ -45,7 +46,10 @@ if(isset($_POST) && $_POST != null){
 <br>
     <label><b>کلمه عبور</b></label>
     <input type="text" placeholder="کلمه عبور را وارد کنید" name="user_pass" required>
-   <br>
+<br>
+    <label><b> آدرس </b></label>
+    <textarea rows="5" cols="20" placeholder="آدرس خود را وارد کنید" name="user_address"></textarea>
+<br>
     <div class="clearfix">
       <button type="submit" class="signupbtn">ثبت نام</button>
     </div>

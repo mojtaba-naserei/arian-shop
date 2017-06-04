@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jun 02, 2017 at 03:37 PM
+-- Generation Time: Jun 04, 2017 at 10:15 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.21
 
@@ -31,7 +31,7 @@ CREATE TABLE `comments` (
   `order_id` int(11) NOT NULL,
   `score` int(11) NOT NULL,
   `description` text COLLATE utf8_persian_ci NOT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `create_time` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- --------------------------------------------------------
@@ -47,7 +47,7 @@ CREATE TABLE `orders` (
   `total_disscount` int(11) NOT NULL,
   `peyk_code` int(11) NOT NULL,
   `create_time` int(11) NOT NULL,
-  `edit_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `edit_time` int(10) NOT NULL,
   `session` varchar(50) COLLATE utf8_persian_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
@@ -62,11 +62,11 @@ CREATE TABLE `payments` (
   `order_id` int(11) NOT NULL,
   `tracking_code` varchar(100) COLLATE utf8_persian_ci NOT NULL,
   `pay_id` int(11) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time` int(10) NOT NULL,
   `card_number` varchar(20) COLLATE utf8_persian_ci NOT NULL,
   `port_name` varchar(30) COLLATE utf8_persian_ci NOT NULL,
   `price` int(11) NOT NULL,
-  `status` tinyint(1) NOT NULL
+  `status` tinyint(1) NOT NULL DEFAULT '2'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- --------------------------------------------------------
@@ -83,9 +83,9 @@ CREATE TABLE `products_menu` (
   `product_number` int(11) NOT NULL,
   `product_price` int(11) NOT NULL,
   `product_disscount` int(11) NOT NULL,
-  `product_pic` text COLLATE utf8_persian_ci NOT NULL,
+  `product_pic` text COLLATE utf8_persian_ci,
   `product_description` text COLLATE utf8_persian_ci NOT NULL,
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `create_time` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- --------------------------------------------------------
@@ -141,6 +141,7 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `user_name_family` varchar(50) NOT NULL,
   `user_mobile` varchar(11) CHARACTER SET utf8 COLLATE utf8_persian_ci NOT NULL,
+  `user_address` text NOT NULL,
   `user_pass` varchar(50) NOT NULL,
   `user_type` tinyint(1) NOT NULL DEFAULT '2',
   `session` varchar(100) CHARACTER SET utf8 COLLATE utf8_persian_ci NOT NULL
@@ -150,9 +151,8 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `user_name_family`, `user_mobile`, `user_pass`, `user_type`, `session`) VALUES
-(1, 'root', '09213369379', '7b24afc8bc80e548d66c4e7ff72171c5', 1, '')
-
+INSERT INTO `users` (`user_id`, `user_name_family`, `user_mobile`, `user_address`, `user_pass`, `user_type`, `session`) VALUES
+(1, 'root', '09213369379', '', '7b24afc8bc80e548d66c4e7ff72171c5', 1, '')
 
 --
 -- Indexes for dumped tables
@@ -183,6 +183,12 @@ ALTER TABLE `products_menu`
   ADD PRIMARY KEY (`product_code`);
 
 --
+-- Indexes for table `products_order`
+--
+ALTER TABLE `products_order`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `restaurant_managers`
 --
 ALTER TABLE `restaurant_managers`
@@ -205,35 +211,45 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `products_menu`
 --
 ALTER TABLE `products_menu`
-  MODIFY `product_code` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `product_code` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+--
+-- AUTO_INCREMENT for table `products_order`
+--
+ALTER TABLE `products_order`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `restaurant_managers`
 --
 ALTER TABLE `restaurant_managers`
-  MODIFY `restaurant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `restaurant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `transporter`
 --
 ALTER TABLE `transporter`
-  MODIFY `transporter_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `transporter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
