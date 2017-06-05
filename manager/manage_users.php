@@ -1,6 +1,18 @@
 <?php
 require_once('../lib/connection.php'); //connect to DB
-
+require_once('../lib/jdf.php'); //for shamsi time
+require_once('../lib/shop.php'); 
+$shop = new Shop();
+session_start();
+//===========================================  check access
+if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
+if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+    $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
+    header("Location: ../index.php");
+    die();
+}
+//===========================================  check access
 //===================================== update
 if(isset($_POST) && $_POST != null){
     $user_id = $_POST['user_id'];
@@ -54,3 +66,5 @@ $sql = "SELECT * FROM users WHERE 1";
 <br>
 <h2>اضافه کردن کاربر</h2>
 <iframe height="250"  width="500" src="../registers/user_register.php"></iframe> <!-- add users -->
+
+<button onclick="window.history.back()">برگشت </button>

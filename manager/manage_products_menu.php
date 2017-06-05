@@ -2,6 +2,18 @@
 require_once('../lib/connection.php'); //connect to DB
 require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
+$shop = new Shop();
+session_start();
+//===========================================  check access
+if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
+if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
+if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user'){
+    $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
+    header("Location: ../index.php");
+    die();
+}
+//===========================================  check access
+
 //===================================== update
 $shop = new shop();
 if(isset($_POST) && $_POST != null){
@@ -72,6 +84,7 @@ if(isset($_POST) && $_POST != null){
         $product_number = $_POST['product_number'];
         $product_price = str_replace(',','',$_POST['product_price']);
         $product_disscount = $_POST['product_disscount'];
+        $ctime = time();
         if($shop->upload($_FILES["fileToUpload"],true))
              $product_pic = $_FILES["fileToUpload"]["name"];
         else 
@@ -89,8 +102,8 @@ if(isset($_POST) && $_POST != null){
             isset($product_description) &&
             isset($product_pic) 
         ){
-            $sql = "INSERT INTO products_menu (restaurant_id, product_name,product_type,product_number,product_price,product_disscount,product_description,product_pic)
-            VALUES ('$restaurant_id','$product_name','$product_type','$product_number','$product_price','$product_disscount','$product_description','$product_pic')";
+            $sql = "INSERT INTO products_menu (restaurant_id, product_name,product_type,product_number,product_price,product_disscount,product_description,product_pic,create_time)
+            VALUES ('$restaurant_id','$product_name','$product_type','$product_number','$product_price','$product_disscount','$product_description','$product_pic','$ctime')";
 
             if ($conn->query($sql) === TRUE) {
                 //============== upload image
@@ -108,8 +121,13 @@ if(isset($_POST) && $_POST != null){
     }
 }
 //================================================== load data
-
-    $sql = "SELECT * FROM products_menu WHERE 1";
+    if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){
+        $sql = "SELECT * FROM products_menu WHERE 1";
+    }
+    else {
+        $restaurantId = $shop->checkAccess(0,$userId,$managerId,$conn)['restaurant_id'];
+        $sql = "SELECT * FROM products_menu WHERE restaurant_id='$restaurantId'";
+    }
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
 
@@ -118,14 +136,21 @@ if(isset($_POST) && $_POST != null){
         while($row = $result->fetch_assoc()) {
                 echo '<form action="" method="post">';
                 echo '<tr><td>'.$row["product_code"].'</td>';
-                echo '<td><select name="restaurant_id" required>';
-                for($i=0;$i<count($shop->getShop(null,null,$conn));$i++){
-                    if($row["restaurant_id"] == $shop->getShop(null,null,$conn)[$i]['restaurant_id'])
-                     echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" selected>'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
-                    else 
-                     echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
+                
+                if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){
+                    echo '<td><select name="restaurant_id" required>';
+                    for($i=0;$i<count($shop->getShop(null,null,$conn));$i++){
+                        if($row["restaurant_id"] == $shop->getShop(null,null,$conn)[$i]['restaurant_id'])
+                             echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" selected>'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
+                        else 
+                             echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
+                     }
+                     echo '</select></td>';
                 }
-                echo '</select></td>';
+                else {
+                     echo ' <input type="hidden" name="restaurant_id" value="'.$row['restaurant_id'].'"> ';
+                     echo '<td>'.$shop->getShop($row['restaurant_id'],null,$conn)[0]['restaurant_name'].'</td>';
+                }
                 echo '<td><input type="text" name="product_name" value="'.$row["product_name"].'"></td>';
                 echo '<td><input type="text" name="product_type" value="'.$row["product_type"].'"></td>';
                 echo '<td><input type="text" name="product_number" value="'.$row["product_number"].'"></td>';
@@ -165,13 +190,19 @@ if(isset($_POST) && $_POST != null){
     else {
         echo 'هیچ منویی وجود ندارد';
     }
+
+
+
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'user'){
 ?>
+
 <br>
 <h2>اضافه کردن منو</h2>
 <div> 
 <form action="" method="post" enctype="multipart/form-data">
   <div class="container">
    <label><b>نام فروشگاه</b></label>
+<?php if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){ ?>
     <select name="restaurant_id" required>
            <?php     
             for($i=0;$i<count($shop->getShop(null,null,$conn));$i++){
@@ -179,6 +210,12 @@ if(isset($_POST) && $_POST != null){
             } 
             ?>
     </select>
+<?php } 
+else { 
+ echo ' <input type="hidden" name="restaurant_id" value="'.$restaurantId.'"> ';   
+ echo '<td>'.$shop->getShop($restaurantId,null,$conn)[0]['restaurant_name'].'</td>';
+}
+?>
 <br>
     <label><b>نام محصول</b></label>
     <input type="text" placeholder="نام محصول را وارد کنید" name="product_name" required>
@@ -208,3 +245,7 @@ if(isset($_POST) && $_POST != null){
   </div>
 </form> 
 </div>
+
+<?php } ?>
+
+<button onclick="window.history.back()">برگشت </button>

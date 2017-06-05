@@ -15,8 +15,10 @@ $restaurant = $shop->getShop(null,2,$conn);
 echo '<table border="1">';
 echo '<tr><td> نام فست فود</td></tr>';
 for($i=0;$i<count($restaurant);$i++){
-    echo '<tr><td><a href="restaurant.php?id='.$restaurant[$i]['restaurant_id'].'">'.$restaurant[$i]['restaurant_name'].'</a></td></tr>';
+    echo '<tr><td><a href="food.php?id='.$restaurant[$i]['restaurant_id'].'">'.$restaurant[$i]['restaurant_name'].'</a></td></tr>';
 }
 echo '</table>';
 
 ?>
+
+<button onclick="window.history.back()">برگشت </button>

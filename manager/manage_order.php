@@ -1,9 +1,18 @@
 <?php
 require_once('../lib/connection.php'); //connect to DB
 require_once('../lib/jdf.php'); //for shamsi time
-require_once('../lib/shop.php');
-$shop = new shop();
+require_once('../lib/shop.php'); 
+$shop = new Shop();
 session_start();
+//===========================================  check access
+if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
+if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+    $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
+    header("Location: ../index.php");
+    die();
+}
+//===========================================  check access
 if(isset($_POST['show'])){
     $order_id = $_POST['show'];
     $_SESSION["order_id"] = $order_id;
@@ -117,3 +126,5 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
   $conn->close(); 
 
 ?>
+
+<button onclick="window.history.back()">برگشت </button>

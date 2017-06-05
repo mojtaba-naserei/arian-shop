@@ -139,6 +139,42 @@ class shop{
             }
         }        
     }
+
+    public function logOut(){
+        unset($_SESSION['userid']);
+        unset($_SESSION['managerid']);
+        unset($_SESSION['message']);
+        header("Location: index.php");
+    }
+
+    public function checkAccess($stat,$userId,$managerId,$conn){
+        if(isset($managerId)){
+            $manager = $this->getShop($managerId,null,$conn)[0];
+            if($stat == 0)
+                return $manager;
+            else 
+                return 'manager';
+        }
+        else if (isset($userId)) {
+            $user =  $this->getUsers($userId,$conn)[0]; 
+            if ($user['user_type'] != 1){
+                if($stat == 0)
+                    return $user;
+                else 
+                    return 'user';
+            }
+            else {
+               if($stat == 0) 
+                    return $user;
+               else 
+                    return 'admin';
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
 }
 
 
