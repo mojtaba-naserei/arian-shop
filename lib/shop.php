@@ -1,14 +1,18 @@
 <?php
 class shop{
-    public function getShop($id,$conn) {
+    public function getShop($id,$type,$conn) {
         if($id != null){
             $sql = "SELECT * FROM restaurant_managers WHERE  restaurant_id='$id'";
+        }
+        else if($type != null){
+            $sql = "SELECT * FROM restaurant_managers WHERE  restaurant_type='$type'";
         }
         else {
             $sql = "SELECT * FROM restaurant_managers WHERE  1";
         }
         
         $result = $conn->query($sql);
+        $mshop= '';
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -58,6 +62,7 @@ class shop{
         }
         
         $result = $conn->query($sql);
+        $user ='';
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -75,15 +80,19 @@ class shop{
         return $user;
     }
     
-    public function getProduct($product_code,$conn) {
+    public function getProduct($product_code,$restaurant_id,$conn) {
         if($product_code != null){
             $sql = "SELECT * FROM products_menu WHERE  product_code='$product_code'";
+        }
+        else if($restaurant_id !=null){
+            $sql = "SELECT * FROM products_menu WHERE  restaurant_id='$restaurant_id' AND product_number>=1";
         }
         else {
             $sql = "SELECT * FROM products_menu WHERE  1";
         }
         
         $result = $conn->query($sql);
+        $food = '';
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {

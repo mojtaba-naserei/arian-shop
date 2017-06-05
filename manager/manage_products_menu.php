@@ -119,11 +119,11 @@ if(isset($_POST) && $_POST != null){
                 echo '<form action="" method="post">';
                 echo '<tr><td>'.$row["product_code"].'</td>';
                 echo '<td><select name="restaurant_id" required>';
-                for($i=0;$i<count($shop->getShop(null,$conn));$i++){
-                    if($row["restaurant_id"] == $shop->getShop(null,$conn)[$i]['restaurant_id'])
-                     echo '<option value="'.$shop->getShop(null,$conn)[$i]['restaurant_id'].'" selected>'.$shop->getShop(null,$conn)[$i]['restaurant_name'].'</option>';    
+                for($i=0;$i<count($shop->getShop(null,null,$conn));$i++){
+                    if($row["restaurant_id"] == $shop->getShop(null,null,$conn)[$i]['restaurant_id'])
+                     echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" selected>'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
                     else 
-                     echo '<option value="'.$shop->getShop(null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,$conn)[$i]['restaurant_name'].'</option>';    
+                     echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
                 }
                 echo '</select></td>';
                 echo '<td><input type="text" name="product_name" value="'.$row["product_name"].'"></td>';
@@ -174,8 +174,8 @@ if(isset($_POST) && $_POST != null){
    <label><b>نام فروشگاه</b></label>
     <select name="restaurant_id" required>
            <?php     
-            for($i=0;$i<count($shop->getShop(null,$conn));$i++){
-                echo '<option value="'.$shop->getShop(null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,$conn)[$i]['restaurant_name'].'</option>';    
+            for($i=0;$i<count($shop->getShop(null,null,$conn));$i++){
+                echo '<option value="'.$shop->getShop(null,null,$conn)[$i]['restaurant_id'].'" >'.$shop->getShop(null,null,$conn)[$i]['restaurant_name'].'</option>';    
             } 
             ?>
     </select>

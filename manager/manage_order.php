@@ -71,15 +71,15 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
                 $orderId = $row["order_id"];
                 echo '<form action="" method="post">';
                 echo '<td><select name="food_code" required>';
-                for($i=0;$i<count($shop->getProduct(null,$conn));$i++){
-                    if($row["food_code"] == $shop->getProduct(null,$conn)[$i]['product_code'])
-                     echo '<option value="'.$shop->getProduct(null,$conn)[$i]['product_code'].'" selected>'.$shop->getProduct(null,$conn)[$i]['product_code'].'</option>';    
+                for($i=0;$i<count($shop->getProduct(null,null,$conn));$i++){
+                    if($row["food_code"] == $shop->getProduct(null,null,$conn)[$i]['product_code'])
+                     echo '<option value="'.$shop->getProduct(null,null,$conn)[$i]['product_code'].'" selected>'.$shop->getProduct(null,null,$conn)[$i]['product_code'].'</option>';    
                     else 
-                     echo '<option value="'.$shop->getProduct(null,$conn)[$i]['product_code'].'" >'.$shop->getProduct(null,$conn)[$i]['product_code'].'</option>';    
+                     echo '<option value="'.$shop->getProduct(null,null,$conn)[$i]['product_code'].'" >'.$shop->getProduct(null,null,$conn)[$i]['product_code'].'</option>';    
                 }
                 echo '</select></td>';
                 echo '<td><input type="text" name="order_number" value="'.$row["order_number"].'"></td>';
-                echo '<td>'.$shop->getShop($row["restaurant_id"],$conn)[0]['restaurant_name'].'</td>';
+                echo '<td>'.$shop->getShop($row["restaurant_id"],null,$conn)[0]['restaurant_name'].'</td>';
                 echo '
                 <td>  
                 <input type="submit" value="بروز رسانی">
