@@ -4,10 +4,14 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+if(isset($_POST['back'])){
+    header("Location: manager.php");
+    die();
+}
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
-if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin' or $shop->checkAccess(1,$userId,$managerId,$conn) == null){
     $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
     die();
@@ -81,14 +85,24 @@ if(isset($_POST) && $_POST != null){
                             if ($row["status"] == 2) echo ' <option value="2" selected>کنسل</option><option value="1">پرداخت</option>';  
                 echo '</select>
                     </td>';
+                
                 echo '<td><select name="peyk_code" required>';
-                for($i=0;$i<count($shop->getPeyk(null,$conn));$i++){
+                if($row["peyk_code"] != 0){
+                    for($i=0;$i<count($shop->getPeyk(null,$conn));$i++){
                     if($row["peyk_code"] == $shop->getPeyk(null,$conn)[$i]['transporter_id'])
-                     echo '<option value="'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'" selected>'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'</option>';    
+                         echo '<option value="'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'" selected>'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'</option>';    
                     else 
-                     echo '<option value="'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'" >'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'</option>';    
+                         echo '<option value="'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'" >'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'</option>';    
+                    }
+                }
+                else {
+                    echo '<option value="0" selected>بدون پیک</option>';    
+                   for($i=0;$i<count($shop->getPeyk(null,$conn));$i++){
+                        echo '<option value="'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'" >'.$shop->getPeyk(null,$conn)[$i]['transporter_id'].'</option>';    
+                   }
                 }
                 echo '</select></td>';
+
                 echo '<td><select name="customer_id" required>';
                 for($i=0;$i<count($shop->getUsers(null,$conn));$i++){
                     if($row["customer_id"] == $shop->getUsers(null,$conn)[$i]['user_id'])
@@ -126,4 +140,4 @@ if(isset($_POST) && $_POST != null){
 
 ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

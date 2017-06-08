@@ -4,10 +4,14 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+if(isset($_POST['back'])){
+    header("Location: manager.php");
+    die();
+}
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
-if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin' or $shop->checkAccess(1,$userId,$managerId,$conn) == null){
     $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
     die();
@@ -83,7 +87,14 @@ $sql = "SELECT * FROM payments WHERE 1";
                 echo '<td><input type="text" name="pay_id" value="'.$row["pay_id"].'"></td>';
                 echo '<td><input type="text" name="time" value="'.jdate("o/m/j",$row["time"]).'"></td>';
                 echo '<td><input type="text" name="card_number" value="'.implode("-",str_split($row["card_number"],4)).'"></td>';
-                echo '<td><input type="text" name="port_name" value="'.$row["port_name"].'"></td>';
+                 echo '<td>
+                        <select name="port_name" required>';
+                            if ($row["port_name"] == 'parsian') echo ' <option value="parsian" selected>پارسیان</option><option value="mellat">ملت</option><option value="saman">سامان</option>';
+                            if ($row["port_name"] == 'mellat') echo ' <option value="mellat" selected>ملت</option><option value="parsian">پارسیان</option><option value="saman">سامان</option>';
+                            if ($row["port_name"] == 'saman') echo ' <option value="saman" selected>سامان</option><option value="mellat">ملت</option><option value="parsian">پارسیان</option>';
+                            
+                echo '</select>
+                    </td>';
                 echo '<td><input type="text" name="price" value="'.number_format($row["price"]).'"></td>';
                 echo '<td>
                         <select name="status" required>';
@@ -111,4 +122,4 @@ $sql = "SELECT * FROM payments WHERE 1";
 
 ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

@@ -4,12 +4,20 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
-if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user'){
+if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user' or $shop->checkAccess(1,$userId,$managerId,$conn) == null){
     $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
+    die();
+}
+if(isset($_POST['back'])){
+    if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin')
+        header("Location: manager.php");
+    else 
+        header("Location: ../index.php");
     die();
 }
 //===========================================  check access
@@ -122,7 +130,7 @@ if(isset($_POST) && $_POST != null){
 }
 //================================================== load data
     if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){
-        $sql = "SELECT * FROM products_menu WHERE 1";
+        $sql = "SELECT * FROM products_menu WHERE 1 ORDER BY restaurant_id ASC";
     }
     else {
         $restaurantId = $shop->checkAccess(0,$userId,$managerId,$conn)['restaurant_id'];
@@ -248,4 +256,4 @@ else {
 
 <?php } ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

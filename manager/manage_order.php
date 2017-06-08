@@ -4,10 +4,14 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+if(isset($_POST['back'])){
+    header("Location: manager.php");
+    die();
+}
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
-if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin' or $shop->checkAccess(1,$userId,$managerId,$conn) == null){
     $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
     die();
@@ -31,12 +35,7 @@ if(isset($_POST) && $_POST != null){
         // $sql1= "UPDATE payments SET restaurant_id='$restaurant_id' WHERE order_id='$order_id'";
         // $conn->query($sql1);
 
-        $sql = "UPDATE products_order 
-        SET 
-        food_code='$food_code',
-        order_number='$order_number'
-       
-        WHERE id='$record_id'";
+        $sql = "UPDATE products_order SET food_code='$food_code',order_number='$order_number' WHERE id='$record_id'";
 
         if ($conn->query($sql) === TRUE) {
             echo "غذا با موفقیت بروزرسانی شد";
@@ -56,12 +55,7 @@ if(isset($_POST) && $_POST != null){
     }
 }
 //===================================== update
-
-$sql = " SELECT orders.*,payments.status,products_order.*,products_menu.restaurant_id FROM orders 
-LEFT JOIN payments ON orders.order_id = payments.order_id 
-LEFT JOIN products_order ON orders.order_id = products_order.order_id 
-LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code 
-";
+$sql = " SELECT products_order.* FROM products_order WHERE products_order.order_id = $order_id";
  $result = $conn->query($sql);
 
  
@@ -71,12 +65,11 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
         echo '<tr>
         <td>کد غذا</td>
         <td>تعداد غذا</td>
-        <td>کد رستوران</td>
+        <td>نام رستوران</td>
         
         <td>عملیات</td>
         </tr>';
         while($row = $result->fetch_assoc()) {
-                $customerId = $row["customer_id"];
                 $orderId = $row["order_id"];
                 echo '<form action="" method="post">';
                 echo '<td><select name="food_code" required>';
@@ -88,7 +81,7 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
                 }
                 echo '</select></td>';
                 echo '<td><input type="text" name="order_number" value="'.$row["order_number"].'"></td>';
-                echo '<td>'.$shop->getShop($row["restaurant_id"],null,$conn)[0]['restaurant_name'].'</td>';
+                echo '<td>'.$shop->getShop($shop->getProduct($row["food_code"],null,$conn)[0]['restaurant_id'],null,$conn)[0]['restaurant_name'].'</td>';
                 echo '
                 <td>  
                 <input type="submit" value="بروز رسانی">
@@ -103,22 +96,6 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
         }
 
         echo '</table>';
-        // echo '<tr>
-        // <td>کد مشتری</td>
-        // <td>کد سفارش</td>
-        // <td>وضعیت سفارش</td>
-        // <td>جمع کل</td>
-        // <td>تخفیف</td>
-        // <td>کد غذا</td>
-        // <td>تعداد غذا</td>
-        // <td>کد رستوران</td>
-        
-        // <td>عملیات</td>
-        // </tr>';
-        // echo '<table border="1"><tr>';
-        // echo '<td>'.$orderId.'</td><td>شماره سفارش</td></tr>';
-        // echo '<tr><td>'.$shop->getUsers($customerId,$conn)[0]['user_name_family'].'</td><td>نام مشتری </td>';
-        // echo '</tr></table>';
     } 
     else {
         echo 'هیچ سفارشی وجود ندارد';
@@ -127,4 +104,4 @@ LEFT JOIN products_menu ON products_order.food_code = products_menu.product_code
 
 ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

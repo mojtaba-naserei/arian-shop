@@ -2,6 +2,10 @@
 require_once('../lib/connection.php'); //connect to DB
 require_once('../lib/shop.php'); 
 $shop = new Shop();
+if(isset($_POST['back'])){
+    header("Location: ../index.php");
+    die();
+}
 //=============================================
 session_start();
 if(!empty($_SESSION['message'])) {
@@ -21,4 +25,4 @@ echo '</table>';
 
 ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

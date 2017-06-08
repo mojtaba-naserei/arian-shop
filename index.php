@@ -19,6 +19,22 @@ if($shop->checkAccess(1,$userId,$managerId,$conn) != null){
         </ul>
         
         ';
+
+        //=========================================================== number of orders
+        $pay = $shop->checkPayments($_SESSION['managerid'],$conn);
+        echo '<table border="1">
+        <tr><td>محصولات سفارش داده شد </td></tr>          
+        <tr><td>تعداد  سفارش</td><td> کد محصول</td></tr>';  
+        if ($pay != null){
+            for($i=0;$i<count($pay);$i++){
+                 echo '  <tr><td>'.array_values($pay)[$i].'</td><td>'.array_keys($pay)[$i].'</td></tr> ';    
+            }
+        }
+        else{
+            echo '<tr><td>هیچ محصولی سفارش داده نشده است.</td></tr>';
+        }
+        echo '</table>';
+        //===========================================================
         
    }
    else {
@@ -32,6 +48,8 @@ if($shop->checkAccess(1,$userId,$managerId,$conn) != null){
             echo 'مدیر کل'.'<br>';
             echo '<ul><li> <a href="manager/manager.php" >مدیریت بخش ها</a></li></ul>';        
         }
+
+        echo '<ul><li> <a href="user/sabad.php" >سبد خرید</a></li></ul>';        
    }
    
     echo '<form action="" method="post">
@@ -68,6 +86,10 @@ else {
         </li>
         </ul>
     ';
+
+     echo '<table border="1">
+        <tr><td> <a href="shop/fastfood_list.php">فست فود</a> </td><td><a href="shop/restaurant_list.php"> رستوران</a> </td></tr>      
+        </table>';
 }
 if (isset($_SESSION['message'])){
     echo '<div>'.$_SESSION['message'].'</div>';
@@ -75,7 +97,7 @@ if (isset($_SESSION['message'])){
 }
 
 if(isset($_POST['logout'])){
-    $shop->logOut();
+    $shop->logOut($conn);
 }
 ?>
 

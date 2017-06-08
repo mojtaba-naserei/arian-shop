@@ -12,7 +12,7 @@ class shop{
         }
         
         $result = $conn->query($sql);
-        $mshop= '';
+        $mshop= null;
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -38,7 +38,7 @@ class shop{
         else {
             $sql = "SELECT * FROM transporter WHERE  1";
         }
-        
+        $peyk = null;
         $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             $i = 0;
@@ -46,11 +46,28 @@ class shop{
                 $peyk[$i]['transporter_id']= $row['transporter_id'] ;
                 $peyk[$i]['transporter_name']= $row['transporter_name'] ;
                 $peyk[$i]['transporter_mobile']= $row['transporter_mobile'];
+                $peyk[$i]['status']= $row['status'];
                 $i++;
             }
         }
        
         return $peyk;
+    }
+
+    public function randomPeyk($conn) {
+        $sql = "SELECT transporter_id FROM transporter WHERE  1";
+        
+        $peyk = null;
+        $result = $conn->query($sql);
+        if ($result->num_rows > 0) {
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $peyk[$i]= $row['transporter_id'];
+                $i++;
+            }
+        }
+        shuffle($peyk);
+        return $peyk[0];
     }
 
     public function getUsers($user_id,$conn) {
@@ -62,7 +79,7 @@ class shop{
         }
         
         $result = $conn->query($sql);
-        $user ='';
+        $user = null;
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -92,7 +109,7 @@ class shop{
         }
         
         $result = $conn->query($sql);
-        $food = '';
+        $food = null;
         if ($result->num_rows > 0) {
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -111,6 +128,115 @@ class shop{
         }
        
         return $food;
+    }
+
+    public function getOrder($userId,$session,$conn) {
+        $sql = "SELECT * FROM orders WHERE  customer_id='$userId' AND session='$session'";
+        $result = $conn->query($sql);
+        $order = null;
+        if ($result->num_rows > 0) {
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $order[$i]['order_id']= $row['order_id'] ;
+                $order[$i]['customer_id']= $row['customer_id'] ;
+                $order[$i]['total_amount']= $row['total_amount'] ;
+                $order[$i]['total_disscount']= $row['total_disscount'];
+                $order[$i]['peyk_code']= $row['peyk_code'];
+                $order[$i]['create_time']= $row['create_time'];
+                $order[$i]['edit_time']= $row['edit_time'];
+                $order[$i]['session']= $row['session'];
+                $i++;
+            }
+        }
+       
+        return $order;
+    }
+
+    public function products_order($orderId,$food_code,$conn) {
+        if($food_code == null)
+            $sql = "SELECT * FROM products_order WHERE  order_id='$orderId'";
+        else 
+            $sql = "SELECT * FROM products_order WHERE  order_id='$orderId' AND food_code='$food_code'";
+
+        $result = $conn->query($sql);
+        $porder = null;
+        if ($result->num_rows > 0) {
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $porder[$i]['order_id']= $row['order_id'] ;
+                $porder[$i]['food_code']= $row['food_code'] ;
+                $porder[$i]['order_number']= $row['order_number'] ;
+                $i++;
+            }
+        }
+       
+        return $porder;
+    }
+    
+    public function getComments($orderId,$conn) {
+        $sql = "SELECT * FROM comments WHERE  order_id='$orderId'";
+        $result = $conn->query($sql);
+        $comment = null;
+        if ($result->num_rows > 0) {
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $comment[$i]['score']= $row['score'] ;
+                $comment[$i]['description']= $row['description'] ;
+                $comment[$i]['create_time']= $row['create_time'] ;
+                $i++;
+            }
+        }
+       
+        return $comment;
+    }
+
+    public function getPayments($orderId,$conn) {
+        $sql = "SELECT * FROM payments WHERE  order_id='$orderId'";
+        $result = $conn->query($sql);
+        $pay = null;
+        if ($result->num_rows > 0) {
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $pay[$i]['order_id']= $row['order_id'] ;
+                $pay[$i]['pay_id']= $row['pay_id'] ;
+                $pay[$i]['time']= $row['time'] ;
+                $pay[$i]['card_number']= $row['card_number'] ;
+                $pay[$i]['port_name']= $row['port_name'] ;
+                $pay[$i]['price']= $row['price'] ;
+                $pay[$i]['status']= $row['status'] ;
+                $i++;
+            }
+        }
+       
+        return $pay;
+    }
+
+    public function checkPayments($restaurant_id,$conn) {
+        $sql = "SELECT * FROM payments 
+        LEFT JOIN products_order ON payments.order_id=products_order.order_id  
+        LEFT JOIN products_menu ON products_order.food_code=products_menu.product_code  
+        WHERE  status=1 ";
+        $result = $conn->query($sql);
+        $pay = null;
+        if ($result->num_rows > 0) {
+            $i = 0;
+            
+            while($row = $result->fetch_assoc()) {
+                if ($restaurant_id == $row['restaurant_id'] ){
+                    if(isset($pay[$row['food_code']]))
+                        $pay[$row['food_code']] += $row['order_number'] ;
+                    else 
+                        $pay[$row['food_code']] = $row['order_number'] ;
+                }
+            
+                $i++;
+            }
+        }
+
+        // $keys = array_keys($pay);
+        // $values = array_values($pay);
+
+        return $pay;
     }
 
     public function upload($file,$check){
@@ -140,10 +266,18 @@ class shop{
         }        
     }
 
-    public function logOut(){
+    public function logOut($conn){
+        $userId =  $_SESSION['userid'];
+        $uniqId =  $_SESSION['uniqid'];
         unset($_SESSION['userid']);
+        unset($_SESSION['uniqid']);
         unset($_SESSION['managerid']);
         unset($_SESSION['message']);
+        //======================= clear session for sabad
+        $sql = "UPDATE orders SET session=''  
+        WHERE customer_id='$userId' AND session='$uniqId'";
+        $conn->query($sql);
+        //======================= clear session for sabad
         header("Location: index.php");
     }
 

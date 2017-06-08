@@ -4,18 +4,34 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+if(isset($_POST['back'])){
+    header("Location: ../index.php");
+    die();
+}
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
 //===========================================
+if (isset($_SESSION['sabad'])){
+    echo $_SESSION['sabad'];
+    unset($_SESSION['sabad']);
+    echo '</br>';
+}
+
+if($shop->checkAccess(1,$userId,$managerId,$conn) == 'admin' && $shop->checkAccess(1,$userId,$managerId,$conn) == 'user'){
+    echo '<ul><li> <a href="../user/sabad.php" >سبد خرید</a></li></ul>'; 
+}
+       
 
 if(($_GET['id'] != null) && (is_numeric($_GET['id']))) {
+    
     $restaurant_id = $_GET['id'];
     $restaurant = $shop->getProduct(null,$restaurant_id,$conn);
     if($restaurant != null){
+        echo 'نام فروشگاه'.'=='.$shop->getShop($restaurant_id,null,$conn)[0]['restaurant_name'].'<hr>';
         echo '<table border="1">';
         echo '<tr><td>شناسه محصول</td><td>نام محصول</td><td>نوع محصول</td><td>تعداد موجودی</td><td>قیمت(ریال)</td><td>تخفیف(درصد)</td><td>َتصویر</td><td>َتوضیحات</td>';
-        if($shop->checkAccess(1,$userId,$managerId,$conn) != 'manager'){
+        if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user' or $shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){
             echo '<td>تعداد سفارش </td><td>عملیات</td> ';
         }
         echo '</tr>';
@@ -31,10 +47,11 @@ if(($_GET['id'] != null) && (is_numeric($_GET['id']))) {
                 else
                     echo '<td>بدون تصویر</td>';
             echo '<td>'.$restaurant[$i]['product_description'] .'</td>';
-            if($shop->checkAccess(1,$userId,$managerId,$conn) != 'manager'){
-                echo '<form action="" method="post">  
-                    <td><input type="text" name="number"></td> 
-                    <input type="hidden" name="product_code">
+            if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user' or $shop->checkAccess(1,$userId,$managerId,$conn) == 'admin'){
+                echo '<form action="../user/buy_product.php" method="post">  
+                    <td><input type="text" name="product_number"></td> 
+                    <input type="hidden" name="product_code" value="'.$restaurant[$i]['product_code'].'">
+                    <input type="hidden" name="restaurant_id" value="'.$restaurant_id.'">
                     <td><input type="submit" value="خرید" name="submit"></td></tr> 
                     </form>';
             }
@@ -53,4 +70,4 @@ else {
 
 ?>
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

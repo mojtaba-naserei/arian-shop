@@ -4,10 +4,14 @@ require_once('../lib/jdf.php'); //for shamsi time
 require_once('../lib/shop.php'); 
 $shop = new Shop();
 session_start();
+if(isset($_POST['back'])){
+    header("Location: manager.php");
+    die();
+}
 //===========================================  check access
 if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
 if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
-if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin'){
+if($shop->checkAccess(1,$userId,$managerId,$conn) != 'admin' or $shop->checkAccess(1,$userId,$managerId,$conn) == null){
     $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
     die();
@@ -18,8 +22,9 @@ if(isset($_POST) && $_POST != null){
     $user_id = $_POST['user_id'];
     $user_name_family = $_POST['user_name_family'];
     $user_mobile = $_POST['user_mobile'];
+    $user_pass = md5($_POST['user_pass']);
     $user_address = $_POST['user_address'];
-    $sql = "UPDATE users SET user_name_family='$user_name_family',user_mobile='$user_mobile',user_address='$user_address'  WHERE user_id='$user_id'";
+    $sql = "UPDATE users SET user_name_family='$user_name_family',user_mobile='$user_mobile',user_pass='$user_pass',user_address='$user_address'  WHERE user_id='$user_id'";
 
     if ($conn->query($sql) === TRUE) {
         echo "کاربر با موفقیت بروزرسانی شد";
@@ -44,6 +49,7 @@ $sql = "SELECT * FROM users WHERE 1";
                 echo '<tr><td>'.$row["user_id"].'</td>';
                 echo '<td><input type="text" name="user_name_family" value="'.$row["user_name_family"].'"></td>';
                 echo '<td><input type="text" name="user_mobile" value="'.$row["user_mobile"].'"></td>';
+                echo '<td><input type="password" name="user_pass" value="'.$row["user_pass"].'"></td>';
                 echo '<td><textarea rows="5" cols="20"  name="user_address">'.$row["user_address"].'</textarea></td>';
                 echo '
                 <td>  
@@ -67,4 +73,4 @@ $sql = "SELECT * FROM users WHERE 1";
 <h2>اضافه کردن کاربر</h2>
 <iframe height="250"  width="500" src="../registers/user_register.php"></iframe> <!-- add users -->
 
-<button onclick="window.history.back()">برگشت </button>
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>

@@ -1,7 +1,19 @@
- <?php
+<?php
 require_once('../lib/connection.php'); //connect to DB
-
-// $conn->close();
+require_once('../lib/shop.php'); 
+$shop = new Shop();
+session_start();
+//===========================================  check access
+if(isset($_SESSION['userid']) or isset($_SESSION['managerid'])){
+    $_SESSION['message'] = 'قبل از ساختن اکانت جدید باید از اکانت جاری خارج شوید';
+    header("Location: ../index.php");
+    die();
+}
+//=====================================================
+if(isset($_POST['back'])){
+    header("Location: ../index.php");
+    die();
+}
 
 if(isset($_POST) && $_POST != null){
     $restaurant_type = $_POST['restaurant_type'];
@@ -41,7 +53,9 @@ if(isset($_POST) && $_POST != null){
             )";
 
             if ($conn->query($sql) === TRUE) {
-                echo "ثبت فروشگاه با موفقیت انجام شد";
+                $_SESSION['message'] = "ثبت فروشگاه با موفقیت انجام شد";
+                header("Location: ../index.php");
+                die();
             } 
             else {
                 echo "Error: " . $sql . "<br>" . $conn->error;
@@ -88,3 +102,5 @@ if(isset($_POST) && $_POST != null){
     </div>
   </div>
 </form> 
+
+<form method="post"><input type="hidden" name="back" value="1"><input type="submit" value="برگشت"></form>
