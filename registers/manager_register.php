@@ -4,8 +4,10 @@ require_once('../lib/shop.php');
 $shop = new Shop();
 session_start();
 //===========================================  check access
-if(isset($_SESSION['userid']) or isset($_SESSION['managerid'])){
-    $_SESSION['message'] = 'قبل از ساختن اکانت جدید باید از اکانت جاری خارج شوید';
+if(isset($_SESSION['userid'])) $userId=  $_SESSION['userid']; else $userId= null;
+if(isset($_SESSION['managerid'])) $managerId=  $_SESSION['managerid']; else $managerId= null;
+if($shop->checkAccess(1,$userId,$managerId,$conn) == 'user' or $shop->checkAccess(1,$userId,$managerId,$conn) == 'manager'){
+    $_SESSION['message'] = 'شما به این صفحه دسترسی ندارید';
     header("Location: ../index.php");
     die();
 }

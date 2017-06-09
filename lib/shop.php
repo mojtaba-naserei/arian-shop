@@ -89,7 +89,6 @@ class shop{
                 $user[$i]['user_address']= $row['user_address'];
                 $user[$i]['user_pass']= $row['user_pass'];
                 $user[$i]['user_type']= $row['user_type'];
-                $user[$i]['session']= $row['session'];
                 $i++;
             }
         }
