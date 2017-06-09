@@ -232,9 +232,6 @@ class shop{
             }
         }
 
-        // $keys = array_keys($pay);
-        // $values = array_values($pay);
-
         return $pay;
     }
 

@@ -27,6 +27,7 @@ if(isset($_POST) && $_POST != null){
     $restaurant_address = $_POST['restaurant_address'];
     $manager_name = $_POST['manager_name'];
     $manager_mobile = $_POST['manager_mobile'];
+    $manager_pass = md5($_POST['manager_pass']);
     $sql = "UPDATE restaurant_managers SET 
         restaurant_type='$restaurant_type',
         restaurant_name='$restaurant_name',  
@@ -34,7 +35,8 @@ if(isset($_POST) && $_POST != null){
         restaurant_tel='$restaurant_tel', 
         restaurant_address='$restaurant_address', 
         manager_name='$manager_name',
-        manager_mobile='$manager_mobile'  
+        manager_mobile='$manager_mobile',  
+        manager_pass='$manager_pass'  
    
     WHERE restaurant_id='$restaurant_id'";
 
@@ -70,6 +72,7 @@ $sql = "SELECT * FROM restaurant_managers WHERE 1";
                 echo '<td><textarea rows="5" cols="20"  name="restaurant_address">'.$row["restaurant_address"].'</textarea></td>';
                 echo '<td><input type="text" name="manager_name" value="'.$row["manager_name"].'"></td>';
                 echo '<td><input type="text" name="manager_mobile" value="'.$row["manager_mobile"].'"></td>';
+                echo '<td><input type="password" name="manager_pass" value="'.$row["manager_pass"].'"></td>';
                 echo '
                 <td>  
                 <input type="submit" value="بروز رسانی">
